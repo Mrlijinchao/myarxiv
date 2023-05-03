@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.SubmissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.Submission">
+            <id property="submissionId" column="submission_id" jdbcType="INTEGER"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="submissionPaperId" column="submission_paper_id" jdbcType="INTEGER"/>
+            <result property="paperId" column="paper_id" jdbcType="INTEGER"/>
+            <result property="submissionIdentifier" column="submission_identifier" jdbcType="VARCHAR"/>
+            <result property="submissionTitle" column="submission_title" jdbcType="VARCHAR"/>
+            <result property="submissionType" column="submission_type" jdbcType="VARCHAR"/>
+            <result property="submissionExpires" column="submission_expires" jdbcType="TIMESTAMP"/>
+            <result property="submissionCreateTime" column="submission_create_time" jdbcType="TIMESTAMP"/>
+            <result property="submissionStatus" column="submission_status" jdbcType="INTEGER"/>
+            <result property="submissionStep" column="submission_step" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        submission_id,user_id,submission_paper_id,
+        paper_id,submission_identifier,submission_title,
+        submission_type,submission_expires,submission_create_time,
+        submission_status,submission_step
+    </sql>
+</mapper>

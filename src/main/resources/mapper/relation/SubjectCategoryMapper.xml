@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.relation.SubjectCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.relation.SubjectCategory">
+            <id property="subjectCategoryId" column="subject_category_id" jdbcType="INTEGER"/>
+            <result property="subjectId" column="subject_id" jdbcType="INTEGER"/>
+            <result property="categoryPrimaryId" column="category_primary_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        subject_category_id,subject_id,category_primary_id
+    </sql>
+</mapper>

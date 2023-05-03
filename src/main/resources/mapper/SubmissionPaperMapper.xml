@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.SubmissionPaperMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.SubmissionPaper">
+            <id property="submissionPaperId" column="submission_paper_id" jdbcType="INTEGER"/>
+            <result property="submissionPaperDetailId" column="submission_paper_detail_id" jdbcType="INTEGER"/>
+            <result property="licenseId" column="license_id" jdbcType="INTEGER"/>
+            <result property="submissionSubjectId" column="submission_subject_id" jdbcType="INTEGER"/>
+            <result property="submissionPaperTitle" column="submission_paper_title" jdbcType="VARCHAR"/>
+            <result property="submissionPaperAbstract" column="submission_paper_abstract" jdbcType="VARCHAR"/>
+            <result property="submissionPaperIdentifier" column="submission_paper_identifier" jdbcType="VARCHAR"/>
+            <result property="submissionPaperCreateTime" column="submission_paper_create_time" jdbcType="TIMESTAMP"/>
+            <result property="submissionPaperComments" column="submission_paper_comments" jdbcType="VARCHAR"/>
+            <result property="submissionPaperUpdateTime" column="submission_paper_update_time" jdbcType="TIMESTAMP"/>
+            <result property="submissionPaperAuthors" column="submission_paper_authors" jdbcType="VARCHAR"/>
+            <result property="submissionPaperStatus" column="submission_paper_status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        submission_paper_id,submission_paper_detail_id,license_id,
+        submission_subject_id,submission_paper_title,submission_paper_abstract,
+        submission_paper_identifier,submission_paper_create_time,submission_paper_comments,
+        submission_paper_update_time,submission_paper_authors,submission_paper_status
+    </sql>
+</mapper>

@@ -1,0 +1,32 @@
+server:
+  port: 8088
+spring:
+  application:
+    #应用的名称（可选）
+    name: myarxiv
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.153.128:3306/myarxiv?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+      username: root
+      password: ljc625995
+    -Ddruid:
+      mysql:
+        usePingMethod=false:
+  mail:
+    port: 465
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+myConfig:
+  submission:
+    fileBasePath: D:/idea/blockchain/myarxiv/src/main/resources/static/files/
+    fileUrlBase: http://localhost:8088/static/files/
+  staticResource:
+    staticPath: D:/idea/blockchain/myarxiv/src/main/resources/static/
+

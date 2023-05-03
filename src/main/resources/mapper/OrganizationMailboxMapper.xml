@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.OrganizationMailboxMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.OrganizationMailbox">
+            <id property="organizationMailboxId" column="organization_mailbox_id" jdbcType="INTEGER"/>
+            <result property="organizationMailboxName" column="organization_mailbox_name" jdbcType="VARCHAR"/>
+            <result property="organizationMailboxEmail" column="organization_mailbox_email" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        organization_mailbox_id,organization_mailbox_name,organization_mailbox_email
+    </sql>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.LicenseMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.License">
+            <id property="licenseId" column="license_id" jdbcType="INTEGER"/>
+            <result property="licenseDescription" column="license_description" jdbcType="VARCHAR"/>
+            <result property="licenseLink" column="license_link" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        license_id,license_description,license_link
+    </sql>
+</mapper>

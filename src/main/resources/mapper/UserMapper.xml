@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.User">
+            <id property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+            <result property="userEmail" column="user_email" jdbcType="VARCHAR"/>
+            <result property="userAccount" column="user_account" jdbcType="VARCHAR"/>
+            <result property="userPassword" column="user_password" jdbcType="VARCHAR"/>
+            <result property="userCountryId" column="user_country_id" jdbcType="INTEGER"/>
+            <result property="userOrganization" column="user_organization" jdbcType="VARCHAR"/>
+            <result property="careerStatusId" column="career_status_id" jdbcType="INTEGER"/>
+            <result property="userCreateTime" column="user_create_time" jdbcType="TIMESTAMP"/>
+            <result property="subjectId" column="subject_id" jdbcType="INTEGER"/>
+            <result property="defaultCategoryId" column="default_category_id" jdbcType="INTEGER"/>
+            <result property="userHomePage" column="user_home_page" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id,user_name,user_email,
+        user_account,user_password,user_country_id,
+        user_organization,career_status_id,user_create_time,
+        subject_id,default_category_id,user_home_page
+    </sql>
+</mapper>

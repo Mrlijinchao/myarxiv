@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.PaperDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.PaperDetail">
+            <id property="paperDetailId" column="paper_detail_id" jdbcType="INTEGER"/>
+            <result property="paperAcmClass" column="paper_acm_class" jdbcType="VARCHAR"/>
+            <result property="paperMscClass" column="paper_msc_class" jdbcType="VARCHAR"/>
+            <result property="paperReportNumber" column="paper_report_number" jdbcType="VARCHAR"/>
+            <result property="paperJournalReference" column="paper_journal_reference" jdbcType="VARCHAR"/>
+            <result property="paperDoi" column="paper_doi" jdbcType="VARCHAR"/>
+            <result property="paperDetailStatus" column="paper_detail_status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        paper_detail_id,paper_acm_class,paper_msc_class,
+        paper_report_number,paper_journal_reference,paper_doi,
+        paper_detail_status
+    </sql>
+</mapper>

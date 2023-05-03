@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.AdminVerifierMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.AdminVerifier">
+            <id property="adminVerifierId" column="admin_verifier_id" jdbcType="INTEGER"/>
+            <result property="adminVerifierAccount" column="admin_verifier_account" jdbcType="VARCHAR"/>
+            <result property="adminVerifierName" column="admin_verifier_name" jdbcType="VARCHAR"/>
+            <result property="adminVerifierEmail" column="admin_verifier_email" jdbcType="VARCHAR"/>
+            <result property="isAdmin" column="is_admin" jdbcType="INTEGER"/>
+            <result property="adminVerifierPassword" column="admin_verifier_password" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        admin_verifier_id,admin_verifier_account,admin_verifier_name,
+        admin_verifier_email,is_admin,admin_verifier_password
+    </sql>
+</mapper>

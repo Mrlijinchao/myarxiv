@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.CategoryPrimaryMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.CategoryPrimary">
+            <id property="categoryPrimaryId" column="category_primary_id" jdbcType="INTEGER"/>
+            <result property="categoryPrimaryName" column="category_primary_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        category_primary_id,category_primary_name
+    </sql>
+</mapper>
