@@ -11,5 +11,5 @@ import java.util.List;
 * @createDate 2023-04-29 22:49:03
 */
 public interface PaperService extends IService<Paper> {
-    public List<Paper> getPaperListByUserId(Integer userId);
+    public List<Object> getPaperListByUserId(Integer userId);
 }

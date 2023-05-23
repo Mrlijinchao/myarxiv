@@ -67,6 +67,17 @@ public class SubjectServiceImpl extends ServiceImpl<SubjectMapper, Subject>
 
             List<SubjectCategory> subjectCategoryList = subjectCategoryMapper.selectList(subjectCategoryQueryWrapper);
 
+            // 没有子类就跳过
+            if(subjectCategoryList.isEmpty()){
+                hashMap.put("subjectId",subjectList.get(i).getSubjectId());
+                hashMap.put("subjectName",subjectList.get(i).getSubjectName());
+                hashMap.put("subjectDescription",subjectList.get(i).getSubjectDescription());
+                hashMap.put("subjectCreateTime",subjectList.get(i).getSubjectCreateTime());
+
+                subjectList1.add(hashMap);
+                continue;
+            }
+
             List<LinkedHashMap<String, Object>> primaryList = new ArrayList<>();
 
             System.out.println("subjectCategoryList.size()::"+subjectCategoryList.size());
@@ -84,6 +95,15 @@ public class SubjectServiceImpl extends ServiceImpl<SubjectMapper, Subject>
                 // 根据 category_primary_id 从 cate_pri_sec 表里拿到 cate_pri_sec 对象
                 catePriSecQueryWrapper.eq("category_primary_id",subjectCategoryList.get(j).getCategoryPrimaryId());
                 List<CatePriSec> catePriSecList = catePriSecMapper.selectList(catePriSecQueryWrapper);
+
+                // 如果没有子类就跳过
+                if(catePriSecList.isEmpty()){
+                    hashMap1.put("categoryPrimaryId",categoryPrimary.getCategoryPrimaryId());
+                    hashMap1.put("categoryPrimaryName",categoryPrimary.getCategoryPrimaryName());
+                    primaryList.add(hashMap1);
+                    continue;
+                }
+
                 QueryWrapper<CategorySecondary> categorySecondaryQueryWrapper = new QueryWrapper<>();
                 ArrayList<Integer> secondaryIdList = new ArrayList<>();
                 for(CatePriSec catePriSec : catePriSecList){

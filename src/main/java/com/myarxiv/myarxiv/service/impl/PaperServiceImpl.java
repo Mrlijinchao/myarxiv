@@ -7,9 +7,12 @@ import com.myarxiv.myarxiv.domain.User;
 import com.myarxiv.myarxiv.domain.relation.UserPaper;
 import com.myarxiv.myarxiv.mapper.UserMapper;
 import com.myarxiv.myarxiv.mapper.relation.UserPaperMapper;
+import com.myarxiv.myarxiv.pojo.PaperRoughly;
 import com.myarxiv.myarxiv.service.PaperService;
 import com.myarxiv.myarxiv.mapper.PaperMapper;
+import com.myarxiv.myarxiv.service.SearchService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import java.util.List;
 * @description 针对表【paper】的数据库操作Service实现
 * @createDate 2023-04-29 22:49:03
 */
+@Transactional
 @Service
 public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper>
     implements PaperService{
@@ -30,8 +34,11 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper>
     @Resource
     private PaperMapper paperMapper;
 
+    @Resource
+    private SearchService searchService;
+
     @Override
-    public List<Paper> getPaperListByUserId(Integer userId) {
+    public List<Object> getPaperListByUserId(Integer userId) {
 
         LambdaQueryWrapper<UserPaper> userPaperLambdaQueryWrapper = new LambdaQueryWrapper<>();
         userPaperLambdaQueryWrapper.eq(UserPaper::getUserId,userId);
@@ -43,7 +50,13 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper>
 
         List<Paper> paperList = paperMapper.selectBatchIds(paperIdList);
 
-        return paperList;
+        ArrayList<Object> paperInfoList = new ArrayList<>();
+        for(Paper p : paperList){
+            PaperRoughly paperRoughly = searchService.getPaperRoughly(p, 0);
+            paperInfoList.add(paperRoughly);
+        }
+
+        return paperInfoList;
     }
 }
 

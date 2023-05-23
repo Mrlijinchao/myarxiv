@@ -47,6 +47,11 @@ public class AdminVerifier implements Serializable {
      */
     private String adminVerifierPassword;
 
+    /**
+     *
+     */
+    private String adminVerifierIntroduce;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -67,7 +72,8 @@ public class AdminVerifier implements Serializable {
             && (this.getAdminVerifierName() == null ? other.getAdminVerifierName() == null : this.getAdminVerifierName().equals(other.getAdminVerifierName()))
             && (this.getAdminVerifierEmail() == null ? other.getAdminVerifierEmail() == null : this.getAdminVerifierEmail().equals(other.getAdminVerifierEmail()))
             && (this.getIsAdmin() == null ? other.getIsAdmin() == null : this.getIsAdmin().equals(other.getIsAdmin()))
-            && (this.getAdminVerifierPassword() == null ? other.getAdminVerifierPassword() == null : this.getAdminVerifierPassword().equals(other.getAdminVerifierPassword()));
+            && (this.getAdminVerifierPassword() == null ? other.getAdminVerifierPassword() == null : this.getAdminVerifierPassword().equals(other.getAdminVerifierPassword()))
+            && (this.getAdminVerifierIntroduce() == null ? other.getAdminVerifierIntroduce() == null : this.getAdminVerifierIntroduce().equals(other.getAdminVerifierIntroduce()));
     }
 
     @Override
@@ -80,6 +86,7 @@ public class AdminVerifier implements Serializable {
         result = prime * result + ((getAdminVerifierEmail() == null) ? 0 : getAdminVerifierEmail().hashCode());
         result = prime * result + ((getIsAdmin() == null) ? 0 : getIsAdmin().hashCode());
         result = prime * result + ((getAdminVerifierPassword() == null) ? 0 : getAdminVerifierPassword().hashCode());
+        result = prime * result + ((getAdminVerifierIntroduce() == null) ? 0 : getAdminVerifierIntroduce().hashCode());
         return result;
     }
 
@@ -95,6 +102,7 @@ public class AdminVerifier implements Serializable {
         sb.append(", adminVerifierEmail=").append(adminVerifierEmail);
         sb.append(", isAdmin=").append(isAdmin);
         sb.append(", adminVerifierPassword=").append(adminVerifierPassword);
+        sb.append(", adminVerifierIntroduce=").append(adminVerifierIntroduce);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

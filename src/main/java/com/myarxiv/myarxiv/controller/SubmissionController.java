@@ -2,10 +2,12 @@ package com.myarxiv.myarxiv.controller;
 
 import com.myarxiv.myarxiv.common.ResponseResult;
 import com.myarxiv.myarxiv.common.StatusCode;
+import com.myarxiv.myarxiv.domain.License;
 import com.myarxiv.myarxiv.domain.PaperDetail;
 import com.myarxiv.myarxiv.domain.SubmissionPaper;
 import com.myarxiv.myarxiv.pojo.PriAndSec;
 import com.myarxiv.myarxiv.pojo.SubmissionStep;
+import com.myarxiv.myarxiv.service.LicenseService;
 import com.myarxiv.myarxiv.service.SubmissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class SubmissionController {
 
     @Resource
     private SubmissionService submissionService;
+
+    @Resource
+    private LicenseService licenseService;
 
     @PostMapping("/step1")
     public Object step1(Integer userId,Integer subjectId,Integer categoryPrimaryId,
@@ -68,5 +73,10 @@ public class SubmissionController {
         return submissionService.saveLastSubmit(submissionStep);
     }
 
+    @GetMapping("/getLicense")
+    public Object getLicense(){
+        List<License> list = licenseService.list();
+        return ResponseResult.success(list);
+    }
 
 }
