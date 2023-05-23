@@ -2,6 +2,7 @@ package com.myarxiv.myarxiv.service;
 
 import com.myarxiv.myarxiv.domain.Paper;
 import com.myarxiv.myarxiv.pojo.PaperRoughly;
+import org.springframework.stereotype.Service;
 
 public interface SearchService {
 
@@ -16,6 +17,6 @@ public interface SearchService {
     public Object searchTemplate(String query,String searchField,Integer pageSize,Integer orderByCode,Integer pageNum);
     public Object searchByDetailTemplate(String query,String searchField,Integer pageSize,Integer orderByCode,Integer pageNum);
 
-    public PaperRoughly getPaperRoughly(Paper paper);
+    public PaperRoughly getPaperRoughly(Paper paper,Integer paperStatus);
 
 }

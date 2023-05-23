@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 * @description 针对表【user】的数据库操作Service实现
 * @createDate 2023-04-22 22:43:39
 */
-
+@Transactional
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{

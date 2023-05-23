@@ -107,7 +107,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.myarxiv.myarxiv.MyarxivApplication</mainClass>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -120,5 +120,8 @@
             </plugin>
         </plugins>
     </build>
+
+
+
 
 </project>

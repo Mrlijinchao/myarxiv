@@ -11,10 +11,12 @@
             <result property="adminVerifierEmail" column="admin_verifier_email" jdbcType="VARCHAR"/>
             <result property="isAdmin" column="is_admin" jdbcType="INTEGER"/>
             <result property="adminVerifierPassword" column="admin_verifier_password" jdbcType="VARCHAR"/>
+            <result property="adminVerifierIntroduce" column="admin_verifier_introduce" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         admin_verifier_id,admin_verifier_account,admin_verifier_name,
-        admin_verifier_email,is_admin,admin_verifier_password
+        admin_verifier_email,is_admin,admin_verifier_password,
+        admin_verifier_introduce
     </sql>
 </mapper>

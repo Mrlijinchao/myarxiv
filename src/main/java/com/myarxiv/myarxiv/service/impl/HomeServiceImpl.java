@@ -74,7 +74,7 @@ public class HomeServiceImpl implements HomeService {
                 fileIdList.add(pf.getFileId());
             }
             List<Files> fileList = filesMapper.selectBatchIds(fileIdList);
-            PaperRoughly paperRoughly = searchService.getPaperRoughly(p);
+            PaperRoughly paperRoughly = searchService.getPaperRoughly(p,0);
             PaperInfo paperInfo = new PaperInfo();
             paperInfo.setPaperRoughly(paperRoughly);
             paperInfo.setPaperDetail(paperDetail);

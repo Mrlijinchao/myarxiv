@@ -258,7 +258,7 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
 
             try {
                 //保存图片
-                file.transferTo(new File(casePath+"\\"+imageName));
+                file.transferTo(new File(casePath+"/"+imageName));
             } catch (IOException e) {
                 log.info("存储失败！");
                 e.printStackTrace();

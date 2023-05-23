@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.relation.VerifierSubmissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.relation.VerifierSubmission">
+            <id property="verifierSubmissionId" column="verifier_submission_id" jdbcType="INTEGER"/>
+            <result property="verifierId" column="verifier_id" jdbcType="INTEGER"/>
+            <result property="submissionId" column="submission_id" jdbcType="INTEGER"/>
+            <result property="verifierSubmissionStatus" column="verifier_submission_status" jdbcType="INTEGER"/>
+            <result property="verifierSubmissionDate" column="verifier_submission_date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        verifier_submission_id,verifier_id,submission_id,
+        verifier_submission_status,verifier_submission_date
+    </sql>
+</mapper>

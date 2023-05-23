@@ -9,6 +9,8 @@ import com.myarxiv.myarxiv.mail.SendMail;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ClassUtils;
 
 import javax.mail.MessagingException;
 import java.util.*;
@@ -108,10 +110,20 @@ class MyarxivApplicationTests {
     @Test
     public void testMap(){
 
-        LinkedHashMap<String, String> fieldMap = FieldMap.getFieldMap();
-        for (String key : fieldMap.keySet()){
-            System.out.println(key + ":" + fieldMap.get(key));
-        }
+//        LinkedHashMap<String, String> fieldMap = FieldMap.getFieldMap();
+//        for (String key : fieldMap.keySet()){
+//            System.out.println(key + ":" + fieldMap.get(key));
+//        }
+
+//        String path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
+//        System.out.println(path);
+//        ClassPathResource classPathResource = new ClassPathResource("static/index.html");
+//        System.out.println(classPathResource.getPath());
+
+        String str = "1";
+        String[] split = str.split(",");
+
+        System.out.println(Arrays.toString(split));
 
     }
 
