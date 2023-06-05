@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping("/email")
@@ -26,7 +27,9 @@ public class EmailController {
     private OrganizationMailboxService organizationMailboxService;
 
     @PostMapping("/registerVerifies")
-    public Object registerVerifies(String email){
+    public Object registerVerifies(@RequestBody Map<String,String> emailMap){
+        String email = emailMap.get("email");
+        log.info("email: {}",email);
         String code = Tools.randomCode();
         try {
             SendMail.sendMail(email, Tools.getEmailContent(code,"注册验证码邮件"),"注册验证码");

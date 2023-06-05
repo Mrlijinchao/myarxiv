@@ -24,17 +24,17 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) throws Exception {
 //        查看redis中是否存在token，如果不存在直接跳转到登陆页面
-//        String token = request.getHeader("Authorization");
-////        Object o = redisUtils.get(token);
-////        System.out.println("userId:"+o);
-//        if (!redisUtils.hasKey(token)) {
-//            log.info("过期或者不存在的token:",token);
-//            String jsonObj = JSONObject.toJSONString(ResponseResult.fail("你没有token或者你的token已失效", StatusCode.UNAUTHORIZED.getCode()));
-//            returnJson(response,jsonObj);
-//            return false;
-//        }
-//        //刷新token有效期
-//        redisUtils.expire(token, 1, TimeUnit.HOURS);
+        String token = request.getHeader("Authorization");
+//        Object o = redisUtils.get(token);
+//        System.out.println("userId:"+o);
+        if (!redisUtils.hasKey(token)) {
+            log.info("过期或者不存在的token:",token);
+            String jsonObj = JSONObject.toJSONString(ResponseResult.fail("你没有token或者你的token已失效", StatusCode.UNAUTHORIZED.getCode()));
+            returnJson(response,jsonObj);
+            return false;
+        }
+        //刷新token有效期
+        redisUtils.expire(token, 1, TimeUnit.HOURS);
         return true;
     }
 

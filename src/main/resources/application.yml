@@ -7,8 +7,10 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://192.168.153.128:3306/myarxiv?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+      #      url: jdbc:mysql://192.168.153.128:3306/myarxiv?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+      url: jdbc:mysql://127.0.0.1:3306/myarxiv?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
       username: root
+      #      username: myarxiv
       password: ljc625995
     -Ddruid:
       mysql:
@@ -25,8 +27,12 @@ mybatis-plus:
       id-type: ASSIGN_ID
 myConfig:
   submission:
-    fileBasePath: D:/idea/blockchain/myarxiv/src/main/resources/static/files/
-    fileUrlBase: http://localhost:8088/static/files/
+    #    fileBasePath: D:/idea/blockchain/myarxiv/src/main/resources/static/files/
+    fileBasePath: /home/upload/files/
+    #    fileUrlBase: http://localhost:8088/static/files/
+    fileUrlBase: http://43.139.8.186:8088/static/files/
   staticResource:
-    staticPath: D:/idea/blockchain/myarxiv/src/main/resources/static/
+    #    staticPath: D:/idea/blockchain/myarxiv/src/main/resources/static/
+    staticPath: /home/upload/
+
 

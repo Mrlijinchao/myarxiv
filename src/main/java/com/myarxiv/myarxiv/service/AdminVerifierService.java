@@ -25,7 +25,9 @@ public interface AdminVerifierService extends IService<AdminVerifier> {
     public Object saveVerifierAndSubmissionInfo(VerifierSubmission verifierSubmission);
 
     public Object getSubmissionByVerifierIdAndStatus(Integer pageSize,Integer orderByCode,
-                                                    Integer pageNum, Integer verifierId, Integer status);
+                                                     Integer pageNum, Integer verifierId, Integer status);
 
     public Object getVerifierList();
+
+    public Object getUnreviewedSubmissionBySubjectId(Integer pageSize,Integer pageNum, Integer subjectId);
 }

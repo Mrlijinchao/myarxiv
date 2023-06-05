@@ -3,28 +3,25 @@ package com.myarxiv.myarxiv.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myarxiv.myarxiv.common.DateUtils;
-import com.myarxiv.myarxiv.common.FileUtils;
-import com.myarxiv.myarxiv.common.ResponseResult;
+import com.myarxiv.myarxiv.common.*;
 import com.myarxiv.myarxiv.domain.*;
-import com.myarxiv.myarxiv.domain.relation.CatePriSec;
+import com.myarxiv.myarxiv.domain.relation.*;
 
-import com.myarxiv.myarxiv.domain.relation.PaperCategory;
-import com.myarxiv.myarxiv.domain.relation.PaperFile;
-import com.myarxiv.myarxiv.domain.relation.SubjectCategory;
 import com.myarxiv.myarxiv.mapper.*;
 import com.myarxiv.myarxiv.mapper.relation.CatePriSecMapper;
 import com.myarxiv.myarxiv.mapper.relation.PaperCategoryMapper;
 import com.myarxiv.myarxiv.mapper.relation.PaperFileMapper;
 import com.myarxiv.myarxiv.mapper.relation.SubjectCategoryMapper;
-import com.myarxiv.myarxiv.pojo.PriAndSec;
-import com.myarxiv.myarxiv.pojo.SubmissionStep;
+import com.myarxiv.myarxiv.pojo.*;
+import com.myarxiv.myarxiv.service.SearchService;
 import com.myarxiv.myarxiv.service.SubmissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -91,6 +88,15 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
 
     @Resource
     private PaperCategory paperCategory;
+
+    @Resource
+    private PaperMapper paperMapper;
+
+    @Resource
+    private PaperVersionMapper paperVersionMapper;
+
+    @Resource
+    private SearchService searchService;
 
     @Override
     public Object saveInfoFirst(Integer userId, Integer subjectId, Integer categoryPrimaryId,
@@ -378,6 +384,157 @@ public class SubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submiss
         }
 
         return ResponseResult.success("完成提交");
+    }
+
+    @Transactional
+    @Override
+    public Object upDatePaper(PaperUpdateJson paperUpdateJson) {
+        SubmissionStep submissionStep = paperUpdateJson.getSubmissionStep();
+        Submission submission = submissionMapper.selectById(submissionStep.getSubmissionId());
+        // 只更新一个step字段
+        LambdaUpdateWrapper<Submission> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper.eq(Submission::getSubmissionId, submission.getSubmissionId()).set(Submission::getSubmissionStatus, 1)
+                .set(Submission::getSubmissionStep,5).set(Submission::getPaperId,paperUpdateJson.getPaperId());
+        submissionMapper.update(null, lambdaUpdateWrapper);
+        List<PriAndSec> categoryList = submissionStep.getCategoryList();
+        if(categoryList != null && !categoryList.isEmpty()){
+            for(PriAndSec pas : categoryList){
+                PaperCategory paperCategory = new PaperCategory();
+                paperCategory.setCategoryPrimaryId(pas.getCategoryPrimaryId());
+                paperCategory.setCategorySecondaryId(pas.getCategorySecondaryId());
+                paperCategory.setSubmissionPaperId(submission.getSubmissionPaperId());
+                paperCategory.setPaperCategoryStatus(1);
+                paperCategoryMapper.insert(paperCategory);
+            }
+        }
+
+        // 改为审核通过的状态 0未完成提交 1已提交未审核 2审核通过 3 on hold  4表示论文修改所作的提交
+        LambdaUpdateWrapper<Submission> submissionLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        submissionLambdaUpdateWrapper.eq(Submission::getSubmissionId,submission.getSubmissionId())
+                .set(Submission::getSubmissionStatus,4);
+        submissionMapper.update(null,submissionLambdaUpdateWrapper);
+        submission = submissionMapper.selectById(submission.getSubmissionId());
+
+        // 把提交论文改为已审核通过状态 0未审核 1审核通过
+        LambdaUpdateWrapper<SubmissionPaper> submissionPaperLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        submissionPaperLambdaUpdateWrapper.eq(SubmissionPaper::getSubmissionPaperId,submission.getSubmissionPaperId())
+                .set(SubmissionPaper::getSubmissionPaperStatus,1);
+        submissionPaperMapper.update(null,submissionPaperLambdaUpdateWrapper);
+        SubmissionPaper submissionPaper = submissionPaperMapper.selectById(submission.getSubmissionPaperId());
+
+        Date date = new Date();
+        //获取当前系统时间年月这里获取到月如果要精确到日修改("yyyy-MM-dd")
+        String dateForm = new SimpleDateFormat("yyyy").format(date);
+        dateForm = dateForm + "." + new SimpleDateFormat("MM").format(date);
+        dateForm = dateForm + new SimpleDateFormat("dd").format(date);
+        dateForm = dateForm + new SimpleDateFormat("ss").format(date);
+
+        // 插入一条论文信息
+        Paper paper = new Paper();
+        paper.setPaperId(paperUpdateJson.getPaperId());
+        paper.setPaperTitle(submissionPaper.getSubmissionPaperTitle());
+        paper.setPaperAbstract(submissionPaper.getSubmissionPaperAbstract());
+        paper.setPaperAuthors(submissionPaper.getSubmissionPaperAuthors());
+        paper.setPaperComments(submissionPaper.getSubmissionPaperComments());
+        paper.setLicenseId(submissionPaper.getLicenseId());
+        paper.setSubjectId(submissionPaper.getSubmissionSubjectId());
+        paper.setPaperUpdateTime(date);
+        paper.setPaperDetailId(submissionPaper.getSubmissionPaperDetailId());
+        paper.setPaperIdentifier(dateForm);
+        paperMapper.updateById(paper);
+
+        // 把以前论文和文件的关联信息中的paper_id设置为null
+        LambdaUpdateWrapper<PaperFile> paperFileLambdaUpdateWrapper1 = new LambdaUpdateWrapper<>();
+        paperFileLambdaUpdateWrapper1.eq(PaperFile::getPaperId,paper.getPaperId()).set(PaperFile::getPaperId,null);
+        paperFileMapper.update(null, paperFileLambdaUpdateWrapper1);
+
+        // 把论文和文件关联起来
+        LambdaUpdateWrapper<PaperFile> paperFileLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        paperFileLambdaUpdateWrapper.eq(PaperFile::getSubmissionPaperId,submissionPaper.getSubmissionPaperId())
+                .set(PaperFile::getPaperId,paper.getPaperId());
+        paperFileMapper.update(null,paperFileLambdaUpdateWrapper);
+
+        // 把以前的论文类型里面的paper_id设置为null
+        LambdaUpdateWrapper<PaperCategory> paperCategoryLambdaUpdateWrapper1 = new LambdaUpdateWrapper<>();
+        paperCategoryLambdaUpdateWrapper1.eq(PaperCategory::getPaperId,paper.getPaperId()).set(PaperCategory::getPaperId,null);
+        paperCategoryMapper.update(null, paperCategoryLambdaUpdateWrapper1);
+
+        // 把论文和类型关联起来(注意类型里面的status字段未0表示是这篇论文的主要类型，未1的全部是交叉类型)
+        LambdaUpdateWrapper<PaperCategory> paperCategoryLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        paperCategoryLambdaUpdateWrapper.eq(PaperCategory::getSubmissionPaperId,submissionPaper.getSubmissionPaperId())
+                .set(PaperCategory::getPaperId,paper.getPaperId());
+        paperCategoryMapper.update(null,paperCategoryLambdaUpdateWrapper);
+
+        // 把论文详情改为已提交状态 0未审核 1审核通过
+        LambdaUpdateWrapper<PaperDetail> paperDetailLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        paperDetailLambdaUpdateWrapper.eq(PaperDetail::getPaperDetailId,submissionPaper.getSubmissionPaperDetailId())
+                .set(PaperDetail::getPaperDetailStatus,1);
+        paperDetailMapper.update(null,paperDetailLambdaUpdateWrapper);
+
+        // 把以前的版本状态全部设置为1，表示老版本
+        LambdaUpdateWrapper<PaperVersion> paperVersionLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        paperVersionLambdaUpdateWrapper.eq(PaperVersion::getPaperId,paper.getPaperId()).set(PaperVersion::getVersionStatus,1);
+        paperVersionMapper.update(null,paperVersionLambdaUpdateWrapper);
+
+        // 获取最新版本
+        Integer maxVersionNum = paperVersionMapper.getMaxVersionNum(paper.getPaperId());
+        log.info("maxVersionNum: {}",maxVersionNum);
+
+        // 插入最新版本信息
+        PaperVersion paperVersion = new PaperVersion();
+        paperVersion.setPaperId(paper.getPaperId());
+        paperVersion.setSubmissionId(submission.getSubmissionId());
+        paperVersion.setVersionNumber(maxVersionNum + 1);
+        paperVersionMapper.insert(paperVersion);
+
+        return ResponseResult.success("更新论文成功！");
+
+    }
+
+    @Override
+    public Object getSubmissionInfoById(Integer submissionId) {
+
+
+        // 查询 submission
+        Submission submission = submissionMapper.selectById(submissionId);
+
+        // 查询一条submissionPaper
+        SubmissionPaper submissionPaper = submissionPaperMapper.selectById(submission.getSubmissionPaperId());
+        // 查询论文详细
+        PaperDetail paperDetail = paperDetailMapper.selectById(submissionPaper.getSubmissionPaperDetailId());
+        LambdaQueryWrapper<PaperFile> paperFileLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        paperFileLambdaQueryWrapper.eq(PaperFile::getSubmissionPaperId,submission.getSubmissionPaperId());
+        // 查询论文关联的文件
+        List<PaperFile> paperFileList = paperFileMapper.selectList(paperFileLambdaQueryWrapper);
+        ArrayList<Integer> fileIdList = new ArrayList<>();
+        for(PaperFile pf : paperFileList){
+            fileIdList.add(pf.getFileId());
+        }
+
+        Paper paper = new Paper();
+        paper.setPaperId(submissionPaper.getSubmissionPaperId());
+        paper.setPaperComments(submissionPaper.getSubmissionPaperComments());
+        paper.setPaperDetailId(submissionPaper.getSubmissionPaperDetailId());
+        paper.setPaperStatus(submissionPaper.getSubmissionPaperStatus());
+        paper.setPaperIdentifier(submissionPaper.getSubmissionPaperIdentifier());
+        paper.setPaperCreateTime(submissionPaper.getSubmissionPaperCreateTime());
+        paper.setSubjectId(submissionPaper.getSubmissionSubjectId());
+        paper.setLicenseId(submissionPaper.getLicenseId());
+        paper.setPaperUpdateTime(submissionPaper.getSubmissionPaperUpdateTime());
+        paper.setPaperTitle(submissionPaper.getSubmissionPaperTitle());
+        paper.setPaperAuthors(submissionPaper.getSubmissionPaperAuthors());
+        paper.setPaperAbstract(submissionPaper.getSubmissionPaperAbstract());
+
+            PaperRoughly paperRoughly = searchService.getPaperRoughly(paper,1);
+
+            List<Files> fileList = filesMapper.selectBatchIds(fileIdList);
+            SubmissionInfo submissionInfo = new SubmissionInfo();
+            submissionInfo.setSubmission(submission);
+            submissionInfo.setPaperRoughly(paperRoughly);
+            submissionInfo.setPaperDetail(paperDetail);
+            submissionInfo.setFileList(fileList);
+
+        return ResponseResult.success(submissionInfo);
     }
 
 

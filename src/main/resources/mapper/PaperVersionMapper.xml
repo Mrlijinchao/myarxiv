@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myarxiv.myarxiv.mapper.PaperVersionMapper">
+
+    <resultMap id="BaseResultMap" type="com.myarxiv.myarxiv.domain.PaperVersion">
+            <id property="paperVersionId" column="paper_version_id" jdbcType="INTEGER"/>
+            <result property="paperId" column="paper_id" jdbcType="INTEGER"/>
+            <result property="submissionId" column="submission_id" jdbcType="INTEGER"/>
+            <result property="versionStatus" column="version_status" jdbcType="INTEGER"/>
+            <result property="versionNumber" column="version_number" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        paper_version_id,paper_id,submission_id,
+        version_status,version_number
+    </sql>
+</mapper>

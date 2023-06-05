@@ -22,6 +22,7 @@ import com.myarxiv.myarxiv.mapper.relation.VerifierSubmissionMapper;
 import com.myarxiv.myarxiv.pojo.PaperInfo;
 import com.myarxiv.myarxiv.pojo.PaperRoughly;
 import com.myarxiv.myarxiv.pojo.SubmissionInfo;
+import com.myarxiv.myarxiv.pojo.SubmissionMapById;
 import com.myarxiv.myarxiv.service.AdminVerifierService;
 import com.myarxiv.myarxiv.service.SearchService;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 时之始
@@ -78,6 +80,12 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
     @Resource
     private VerifierSubmissionMapper verifierSubmissionMapper;
 
+    @Resource
+    private SubjectMapper subjectMapper;
+
+    @Resource
+    private PaperVersionMapper paperVersionMapper;
+
     @Override
     public Object checkLogin(AdminVerifier adminVerifier) {
 
@@ -96,11 +104,18 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
             }
 
             adminVerifier = adminVerifierAccount;
+
+            Subject subject = subjectMapper.selectById(adminVerifier.getAffiliationSubjectId());
+
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("adminVerifier",adminVerifier);
+            hashMap.put("subject",subject);
+
             //        String token = TokenUtil.generateToken(user);
             String token = "Bearer " + UUID.randomUUID().toString().replaceAll("-", "");
-//        redisUtils.set(token,adminVerifier.getAdminVerifierId(),1, TimeUnit.HOURS);
+            redisUtils.set(token,adminVerifier.getAdminVerifierId(),1, TimeUnit.HOURS);
 
-            return ResponseResult.returnWithToken(adminVerifier, token);
+            return ResponseResult.returnWithToken(hashMap, token);
 
         }
 
@@ -108,6 +123,7 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
 
     }
 
+    @Transactional
     @Override
     public Object saveVerifierInfo(AdminVerifier adminVerifier) {
         //MD5加密
@@ -124,6 +140,7 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
         return ResponseResult.success("创建成功！");
     }
 
+    @Transactional
     @Override
     public Object savePaperInfo(Submission submission) {
 
@@ -185,9 +202,21 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
                 .set(PaperDetail::getPaperDetailStatus,1);
         paperDetailMapper.update(null,paperDetailLambdaUpdateWrapper);
 
+        // 把论文ID存到submission里面
+        submissionLambdaUpdateWrapper.set(Submission::getPaperId,paper.getPaperId());
+        submissionMapper.update(null,submissionLambdaUpdateWrapper);
+
+        // 插入一条版本信息
+        PaperVersion paperVersion = new PaperVersion();
+        paperVersion.setPaperId(paper.getPaperId());
+        paperVersion.setSubmissionId(submission.getSubmissionId());
+        paperVersion.setVersionNumber(1);
+        paperVersionMapper.insert(paperVersion);
+
         return ResponseResult.success("审核成功！");
     }
 
+    @Transactional
     @Override
     public Object changeStatus(VerifierSubmission verifierSubmission) {
 
@@ -514,6 +543,74 @@ public class AdminVerifierServiceImpl extends ServiceImpl<AdminVerifierMapper, A
         adminVerifierLambdaQueryWrapper.eq(AdminVerifier::getIsAdmin,0);
         List<AdminVerifier> adminVerifierList = adminVerifierMapper.selectList(adminVerifierLambdaQueryWrapper);
         return ResponseResult.success(adminVerifierList);
+    }
+
+    @Override
+    public Object getUnreviewedSubmissionBySubjectId(Integer pageSize, Integer pageNum, Integer subjectId) {
+        if(pageNum <= 0){
+            return ResponseResult.fail("页码必须大于0",StatusCode.ERROR.getCode());
+        }
+        if(pageSize < 0){
+            return ResponseResult.fail("页面大小必须大于0",StatusCode.ERROR.getCode());
+        }
+//        Page<Submission> page = new Page<>(pageNum,pageSize);
+
+//        new QueryWrapper<>
+
+        Integer submissionCount = adminVerifierMapper.getSubmissionCount(1,subjectId);
+        if(submissionCount < ((pageNum - 1) * pageSize + 1)){
+            return ResponseResult.fail("页码过大，没有那么多页面", StatusCode.ERROR.getCode());
+        }
+        List<SubmissionMapById> submissionAndPaperList = adminVerifierMapper.getSubmissionAndPaper(1, subjectId, (pageNum - 1) * pageSize, pageSize);
+//        Integer submissionCount = adminVerifierMapper.getSubmissionCount(1,subjectId)
+
+
+        ArrayList<SubmissionInfo> submissionInfoList = new ArrayList<>();
+        for(SubmissionMapById s : submissionAndPaperList){
+            // 查询一条submissionPaper
+            SubmissionPaper submissionPaper = s.getSubmissionPaper();
+            // 查询论文详细
+            PaperDetail paperDetail = paperDetailMapper.selectById(submissionPaper.getSubmissionPaperDetailId());
+            LambdaQueryWrapper<PaperFile> paperFileLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            paperFileLambdaQueryWrapper.eq(PaperFile::getSubmissionPaperId,submissionPaper.getSubmissionPaperId());
+            // 查询论文关联的文件
+            List<PaperFile> paperFileList = paperFileMapper.selectList(paperFileLambdaQueryWrapper);
+            ArrayList<Integer> fileIdList = new ArrayList<>();
+            for(PaperFile pf : paperFileList){
+                fileIdList.add(pf.getFileId());
+            }
+
+            Paper paper = new Paper();
+            paper.setPaperId(submissionPaper.getSubmissionPaperId());
+            paper.setPaperComments(submissionPaper.getSubmissionPaperComments());
+            paper.setPaperDetailId(submissionPaper.getSubmissionPaperDetailId());
+            paper.setPaperStatus(submissionPaper.getSubmissionPaperStatus());
+            paper.setPaperIdentifier(submissionPaper.getSubmissionPaperIdentifier());
+            paper.setPaperCreateTime(submissionPaper.getSubmissionPaperCreateTime());
+            paper.setSubjectId(submissionPaper.getSubmissionSubjectId());
+            paper.setLicenseId(submissionPaper.getLicenseId());
+            paper.setPaperUpdateTime(submissionPaper.getSubmissionPaperUpdateTime());
+            paper.setPaperTitle(submissionPaper.getSubmissionPaperTitle());
+            paper.setPaperAuthors(submissionPaper.getSubmissionPaperAuthors());
+            paper.setPaperAbstract(submissionPaper.getSubmissionPaperAbstract());
+
+            PaperRoughly paperRoughly = searchService.getPaperRoughly(paper,1);
+
+            List<Files> fileList = filesMapper.selectBatchIds(fileIdList);
+            SubmissionInfo submissionInfo = new SubmissionInfo();
+            submissionInfo.setSubmission(s.getSubmission());
+            submissionInfo.setPaperRoughly(paperRoughly);
+            submissionInfo.setPaperDetail(paperDetail);
+            submissionInfo.setFileList(fileList);
+
+            submissionInfoList.add(submissionInfo);
+        }
+        LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
+        hashMap.put("currentPage",pageNum);
+        hashMap.put("pageSize",pageSize);
+        hashMap.put("pageTotal",submissionCount);
+        hashMap.put("submissionInfo",submissionInfoList);
+        return ResponseResult.success(hashMap);
     }
 
 }

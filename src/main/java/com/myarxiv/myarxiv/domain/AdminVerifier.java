@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
  *
  * @TableName admin_verifier
  */
+@Component
 @TableName(value ="admin_verifier")
 @Data
-@Component
 public class AdminVerifier implements Serializable {
     /**
      *
@@ -52,6 +52,11 @@ public class AdminVerifier implements Serializable {
      */
     private String adminVerifierIntroduce;
 
+    /**
+     *
+     */
+    private Integer affiliationSubjectId;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -73,7 +78,8 @@ public class AdminVerifier implements Serializable {
             && (this.getAdminVerifierEmail() == null ? other.getAdminVerifierEmail() == null : this.getAdminVerifierEmail().equals(other.getAdminVerifierEmail()))
             && (this.getIsAdmin() == null ? other.getIsAdmin() == null : this.getIsAdmin().equals(other.getIsAdmin()))
             && (this.getAdminVerifierPassword() == null ? other.getAdminVerifierPassword() == null : this.getAdminVerifierPassword().equals(other.getAdminVerifierPassword()))
-            && (this.getAdminVerifierIntroduce() == null ? other.getAdminVerifierIntroduce() == null : this.getAdminVerifierIntroduce().equals(other.getAdminVerifierIntroduce()));
+            && (this.getAdminVerifierIntroduce() == null ? other.getAdminVerifierIntroduce() == null : this.getAdminVerifierIntroduce().equals(other.getAdminVerifierIntroduce()))
+            && (this.getAffiliationSubjectId() == null ? other.getAffiliationSubjectId() == null : this.getAffiliationSubjectId().equals(other.getAffiliationSubjectId()));
     }
 
     @Override
@@ -87,6 +93,7 @@ public class AdminVerifier implements Serializable {
         result = prime * result + ((getIsAdmin() == null) ? 0 : getIsAdmin().hashCode());
         result = prime * result + ((getAdminVerifierPassword() == null) ? 0 : getAdminVerifierPassword().hashCode());
         result = prime * result + ((getAdminVerifierIntroduce() == null) ? 0 : getAdminVerifierIntroduce().hashCode());
+        result = prime * result + ((getAffiliationSubjectId() == null) ? 0 : getAffiliationSubjectId().hashCode());
         return result;
     }
 
@@ -103,6 +110,7 @@ public class AdminVerifier implements Serializable {
         sb.append(", isAdmin=").append(isAdmin);
         sb.append(", adminVerifierPassword=").append(adminVerifierPassword);
         sb.append(", adminVerifierIntroduce=").append(adminVerifierIntroduce);
+        sb.append(", affiliationSubjectId=").append(affiliationSubjectId);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

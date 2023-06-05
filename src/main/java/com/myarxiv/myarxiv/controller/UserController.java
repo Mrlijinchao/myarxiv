@@ -10,24 +10,23 @@ import com.myarxiv.myarxiv.common.StatusCode;
 import com.myarxiv.myarxiv.domain.Paper;
 import com.myarxiv.myarxiv.domain.Submission;
 import com.myarxiv.myarxiv.domain.User;
+import com.myarxiv.myarxiv.pojo.RegisterBody;
 import com.myarxiv.myarxiv.service.PaperService;
 import com.myarxiv.myarxiv.service.SubmissionService;
 import com.myarxiv.myarxiv.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping("/user")
@@ -46,7 +45,7 @@ public class UserController {
     private PaperService paperService;
 
     @PostMapping("/login")
-    public Object userLogin(User user){
+    public Object userLogin(@RequestBody User user){
 
         log.info("loginUser:{}",user);
 
@@ -56,13 +55,16 @@ public class UserController {
     @GetMapping("/logout")
     public Object userLogout(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        log.info("token: ", token);
         //删除redis的token
         redisUtils.del(token);
         return ResponseResult.success("成功退出！");
     }
 
     @PostMapping("/register")
-    public Object userRegister(User user, String verificationCode){
+    public Object userRegister(@RequestBody RegisterBody registerBody){
+        User user = registerBody.getUser();
+        String verificationCode = registerBody.getVerificationCode();
         log.info("registerUser:{}",user);
         log.info("验证码：{}",verificationCode);
 
@@ -99,6 +101,14 @@ public class UserController {
         LambdaQueryWrapper<Submission> submissionLambdaQueryWrapper = new LambdaQueryWrapper<>();
         submissionLambdaQueryWrapper.eq(Submission::getUserId,user.getUserId()).in(Submission::getSubmissionStatus,0,1);
         List<Submission> submissionList = submissionService.list(submissionLambdaQueryWrapper);
+        log.info("userId: ",user.getUserId());
+        if(submissionList.isEmpty()){
+            LinkedHashMap<String, Object> hashMap = new LinkedHashMap<>();
+            hashMap.put("user",user);
+            hashMap.put("submissionList",null);
+            hashMap.put("paperList",null);
+            return ResponseResult.success(hashMap);
+        }
         // 获取论文信息
         List<Object> paperList = paperService.getPaperListByUserId(user.getUserId());
 
@@ -112,7 +122,8 @@ public class UserController {
 
     @Transactional
     @PostMapping("/changeUserInfo")
-    public Object changeUserInfo(User user){
+    public Object changeUserInfo(@RequestBody User user){
+        log.info("user: {}", user);
         boolean b = userService.updateById(user);
         if(b){
             return ResponseResult.success("修改用户信息成功！");
@@ -122,7 +133,10 @@ public class UserController {
 
     @Transactional
     @PostMapping("/changeUserPassword")
-    public Object changeUserPassword(Integer userId,String oldPassword,String newPassword){
+    public Object changeUserPassword(@RequestBody Map<String,String> userPasswordInfo){
+        Integer userId = Integer.parseInt(userPasswordInfo.get("userId"));
+        String oldPassword = userPasswordInfo.get("oldPassword");
+        String newPassword = userPasswordInfo.get("newPassword");
         log.info("userId:{} oldPassword:{} newPassword:{}",userId,oldPassword,newPassword);
         if(userId == null){
             return ResponseResult.fail("用户id为空",StatusCode.ERROR.getCode());
@@ -148,8 +162,8 @@ public class UserController {
 
     @Transactional
     @PostMapping("/changeUserEmail")
-    public Object changeUserEmail(User user){
-
+    public Object changeUserEmail(@RequestBody User user){
+        log.info("user: {}",user);
         if (user.getUserId() == null){
             return ResponseResult.fail("用户id为空",StatusCode.ERROR.getCode());
         }
@@ -161,6 +175,37 @@ public class UserController {
         }
 
         return ResponseResult.success("修改邮箱失败！");
+    }
+
+    @GetMapping("/getAllUser")
+    public Object getAllUser(){
+        return userService.getAllUser();
+    }
+
+    @Transactional
+    @PostMapping("/frozenUser")
+    public Object frozenUser(@RequestBody User user){
+        log.info("userId: {}",user.getUserId());
+        LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        userLambdaUpdateWrapper.eq(User::getUserId,user.getUserId()).set(User::getUserStatus,1);
+        boolean update = userService.update(userLambdaUpdateWrapper);
+
+        if(update){
+            return ResponseResult.success("封号成功！");
+        }
+        return ResponseResult.fail("封号失败！",StatusCode.ERROR.getCode());
+    }
+
+    @Transactional
+    @PostMapping("/removeUser")
+    public Object removeUser(@RequestBody User user){
+        log.info("userId: {}", user.getUserId());
+
+        boolean b = userService.removeById(user.getUserId());
+        if(b){
+            return ResponseResult.success("永久删除用户成功！");
+        }
+        return ResponseResult.fail("永久删除用户失败！",StatusCode.ERROR.getCode());
     }
 
 }

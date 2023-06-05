@@ -127,6 +127,26 @@ class MyarxivApplicationTests {
 
     }
 
+    @Test
+    public void test(){
+        int[] arr = {1,2,3,4,5};
+        System.out.println(Unknown(arr, 1, 4));
+    }
+
+    public int Unknown(int arr[], int i,int n){
+        if(i == n-1){
+            return arr[i];
+        }else{
+            int tmp = Unknown(arr,i+1,n);
+            if(tmp < arr[i]){
+                return arr[i];
+            }else{
+                return tmp;
+            }
+        }
+
+    }
+
 
 }
 

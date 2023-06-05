@@ -3,12 +3,15 @@ package com.myarxiv.myarxiv.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.myarxiv.myarxiv.common.RedisUtils;
 import com.myarxiv.myarxiv.common.ResponseResult;
 import com.myarxiv.myarxiv.common.SearchOrder;
 import com.myarxiv.myarxiv.common.StatusCode;
 import com.myarxiv.myarxiv.domain.AdminVerifier;
 import com.myarxiv.myarxiv.domain.Submission;
 import com.myarxiv.myarxiv.domain.relation.VerifierSubmission;
+import com.myarxiv.myarxiv.mapper.AdminVerifierMapper;
+import com.myarxiv.myarxiv.pojo.SubmissionMapById;
 import com.myarxiv.myarxiv.service.AdminVerifierService;
 import com.myarxiv.myarxiv.service.SubmissionService;
 import com.myarxiv.myarxiv.service.relation.VerifierSubmissionService;
@@ -17,7 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
+/**
+ * 修改：
+ * 1、把on hold改为拒绝，拒绝的时候可以写一个拒绝的原因
+ * 2、审核员分类，每个学科专业有自己的审核员
+ * 3、论文修改后要保留每个版本
+ */
+@CrossOrigin
 @Slf4j
 @RestController
 @RequestMapping("/adminVerifier")
@@ -32,12 +44,24 @@ public class AdminVerifierController {
     @Resource
     private VerifierSubmissionService verifierSubmissionService;
 
+    @Resource
+    private RedisUtils redisUtils;
+
+    @Resource
+    private AdminVerifierMapper adminVerifierMapper;
+
     @PostMapping("/login")
     public Object login(@RequestBody AdminVerifier adminVerifier){
         log.info("AdminVerifier: {}",adminVerifier);
         return adminVerifierService.checkLogin(adminVerifier);
     }
 
+    @PostMapping("/logout")
+    public Object verifierLogout(HttpServletRequest request){
+        String token = request.getHeader("Authorization");
+        redisUtils.del(token);
+        return ResponseResult.success("登出成功！");
+    }
 
     @PostMapping("/addVerifier")
     public Object addVerifier(@RequestBody  AdminVerifier adminVerifier){
@@ -48,7 +72,6 @@ public class AdminVerifierController {
         if(av != null){
             return ResponseResult.fail("此账号已存在！建议换一个！", StatusCode.ERROR.getCode());
         }
-
         return adminVerifierService.saveVerifierInfo(adminVerifier);
     }
 
@@ -69,7 +92,7 @@ public class AdminVerifierController {
     public Object changeUserInfo(@RequestBody AdminVerifier adminVerifier){
         log.info("adminVerifier: {}",adminVerifier);
         adminVerifierService.updateById(adminVerifier);
-        return ResponseResult.success("修改密码成功！");
+        return ResponseResult.success("修改用户信息成功！");
     }
 
     @Transactional
@@ -92,6 +115,7 @@ public class AdminVerifierController {
     @Transactional
     @PostMapping("/approve")
     public Object approve(@RequestBody VerifierSubmission verifierSubmission){
+        log.info("verifierSubmission: {}",verifierSubmission);
         if(verifierSubmission.getSubmissionId() == null){
             return ResponseResult.fail("submissionId为null",StatusCode.ERROR.getCode());
         }
@@ -104,10 +128,13 @@ public class AdminVerifierController {
 
     @PostMapping("/onHold")
     public Object onHold(@RequestBody VerifierSubmission verifierSubmission){
+        log.info("verifierSubmission:{} ",verifierSubmission);
+
         if(verifierSubmission.getSubmissionId() == null){
             return ResponseResult.fail("submissionId为null",StatusCode.ERROR.getCode());
         }
         log.info("VerifierId: {}",verifierSubmission.getVerifierId());
+
         return adminVerifierService.changeStatus(verifierSubmission);
     }
 
@@ -141,6 +168,14 @@ public class AdminVerifierController {
         }
 
         return adminVerifierService.getUnreviewedSubmission(pageSize,orderByCode,pageNum);
+    }
+
+    @GetMapping("/getUnreviewedSubmissionBySubjectId")
+    public Object getUnreviewedSubmissionBySubjectId(Integer pageSize,Integer pageNum,Integer subjectId){
+        if(pageSize == null || pageSize < 1){
+            pageSize = 10;
+        }
+        return adminVerifierService.getUnreviewedSubmissionBySubjectId(pageSize,pageNum,subjectId);
     }
 
     @GetMapping("/getReviewedSubmission")
@@ -179,8 +214,6 @@ public class AdminVerifierController {
         log.info("verifierId: {}",verifierId);
         return adminVerifierService.getSubmissionByVerifierIdAndStatus(pageSize,orderByCode,pageNum,verifierId,1);
     }
-
-
 
 
 }

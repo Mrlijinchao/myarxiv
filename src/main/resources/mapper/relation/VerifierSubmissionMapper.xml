@@ -10,10 +10,11 @@
             <result property="submissionId" column="submission_id" jdbcType="INTEGER"/>
             <result property="verifierSubmissionStatus" column="verifier_submission_status" jdbcType="INTEGER"/>
             <result property="verifierSubmissionDate" column="verifier_submission_date" jdbcType="TIMESTAMP"/>
+            <result property="verifierReason" column="verifier_reason" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         verifier_submission_id,verifier_id,submission_id,
-        verifier_submission_status,verifier_submission_date
+        verifier_submission_status,verifier_submission_date,verifier_reason
     </sql>
 </mapper>

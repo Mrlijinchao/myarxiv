@@ -7,74 +7,81 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 /**
- * 
+ *
  * @TableName user
  */
+@Component
 @TableName(value ="user")
 @Data
 public class User implements Serializable {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
     private Integer userId;
 
     /**
-     * 
+     *
      */
     private String userName;
 
     /**
-     * 
+     *
      */
     private String userEmail;
 
     /**
-     * 
+     *
      */
     private String userAccount;
 
     /**
-     * 
+     *
      */
     private String userPassword;
 
     /**
-     * 
+     *
      */
     private Integer userCountryId;
 
     /**
-     * 
+     *
      */
     private String userOrganization;
 
     /**
-     * 
+     *
      */
     private Integer careerStatusId;
 
     /**
-     * 
+     *
      */
     private Date userCreateTime;
 
     /**
-     * 
+     *
      */
     private Integer subjectId;
 
     /**
-     * 
+     *
      */
     private Integer defaultCategoryId;
 
     /**
-     * 
+     *
      */
     private String userHomePage;
+
+    /**
+     *
+     */
+    private Integer userStatus;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -102,7 +109,8 @@ public class User implements Serializable {
             && (this.getUserCreateTime() == null ? other.getUserCreateTime() == null : this.getUserCreateTime().equals(other.getUserCreateTime()))
             && (this.getSubjectId() == null ? other.getSubjectId() == null : this.getSubjectId().equals(other.getSubjectId()))
             && (this.getDefaultCategoryId() == null ? other.getDefaultCategoryId() == null : this.getDefaultCategoryId().equals(other.getDefaultCategoryId()))
-            && (this.getUserHomePage() == null ? other.getUserHomePage() == null : this.getUserHomePage().equals(other.getUserHomePage()));
+            && (this.getUserHomePage() == null ? other.getUserHomePage() == null : this.getUserHomePage().equals(other.getUserHomePage()))
+            && (this.getUserStatus() == null ? other.getUserStatus() == null : this.getUserStatus().equals(other.getUserStatus()));
     }
 
     @Override
@@ -121,6 +129,7 @@ public class User implements Serializable {
         result = prime * result + ((getSubjectId() == null) ? 0 : getSubjectId().hashCode());
         result = prime * result + ((getDefaultCategoryId() == null) ? 0 : getDefaultCategoryId().hashCode());
         result = prime * result + ((getUserHomePage() == null) ? 0 : getUserHomePage().hashCode());
+        result = prime * result + ((getUserStatus() == null) ? 0 : getUserStatus().hashCode());
         return result;
     }
 
@@ -142,6 +151,7 @@ public class User implements Serializable {
         sb.append(", subjectId=").append(subjectId);
         sb.append(", defaultCategoryId=").append(defaultCategoryId);
         sb.append(", userHomePage=").append(userHomePage);
+        sb.append(", userStatus=").append(userStatus);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

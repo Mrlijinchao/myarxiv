@@ -12,11 +12,54 @@
             <result property="isAdmin" column="is_admin" jdbcType="INTEGER"/>
             <result property="adminVerifierPassword" column="admin_verifier_password" jdbcType="VARCHAR"/>
             <result property="adminVerifierIntroduce" column="admin_verifier_introduce" jdbcType="VARCHAR"/>
+            <result property="affiliationSubjectId" column="affiliation_subject_id" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         admin_verifier_id,admin_verifier_account,admin_verifier_name,
         admin_verifier_email,is_admin,admin_verifier_password,
-        admin_verifier_introduce
+        admin_verifier_introduce,affiliation_subject_id
     </sql>
+
+    <resultMap id="SubmissionMap" type="com.myarxiv.myarxiv.pojo.SubmissionMapById">
+        <association property="submission" javaType="com.myarxiv.myarxiv.domain.Submission">
+            <result column="submission_id" property="submissionId" />
+            <result column="user_id" property="userId" />
+            <result column="submission_paper_id" property="submissionPaperId" />
+            <result column="paper_id" property="paperId" />
+            <result column="submission_identifier" property="submissionIdentifier" />
+            <result column="submission_title" property="submissionTitle" />
+            <result column="submission_type" property="submissionType" />
+            <result column="submission_expires" property="submissionExpires" />
+            <result column="submission_create_time" property="submissionCreateTime" />
+            <result column="submissionStatus" property="submissionStatus" />
+            <result column="submission_step" property="submissionStep" />
+        </association>
+        <association property="submissionPaper" javaType="com.myarxiv.myarxiv.domain.SubmissionPaper">
+            <result column="submission_paper_id" property="submissionPaperId" />
+            <result column="submission_paper_detail_id" property="submissionPaperDetailId" />
+            <result column="license_id" property="licenseId" />
+            <result column="submission_subject_id" property="submissionSubjectId" />
+            <result column="submission_paper_title" property="submissionPaperTitle" />
+            <result column="submission_paper_abstract" property="submissionPaperAbstract" />
+            <result column="submission_paper_identifier" property="submissionPaperIdentifier" />
+            <result column="submission_paper_create_time" property="submissionPaperCreateTime" />
+            <result column="submission_paper_comments" property="submissionPaperComments" />
+            <result column="submission_paper_update_time" property="submissionPaperUpdateTime" />
+            <result column="submission_paper_authors" property="submissionPaperAuthors" />
+            <result column="submission_paper_status" property="submissionPaperStatus" />
+        </association>
+    </resultMap>
+
+    <select id="getSubmissionAndPaper" resultType="com.myarxiv.myarxiv.pojo.SubmissionMapById" resultMap="SubmissionMap">
+        select * from submission as sb inner join submission_paper as sp on sb.submission_paper_id = sp.submission_paper_id
+         where sb.submission_status = #{submissionStatus} and sp.submission_subject_id = #{subjectId}
+        order by submission_create_time asc limit #{start},#{pageSize}
+    </select>
+
+    <select id="getSubmissionCount" resultType="integer">
+        select COUNT(submission_id) from submission as sb inner join submission_paper as sp on sb.submission_paper_id = sp.submission_paper_id
+        where sb.submission_status = #{submissionStatus} and sp.submission_subject_id = #{subjectId}
+    </select>
+
 </mapper>

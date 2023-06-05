@@ -4,7 +4,9 @@ import com.myarxiv.myarxiv.domain.PaperDetail;
 import com.myarxiv.myarxiv.domain.Submission;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myarxiv.myarxiv.domain.SubmissionPaper;
+import com.myarxiv.myarxiv.pojo.PaperUpdateJson;
 import com.myarxiv.myarxiv.pojo.SubmissionStep;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,5 +33,9 @@ public interface SubmissionService extends IService<Submission> {
     public Object searchInfo(Integer submissionId);
 
     public Object saveLastSubmit(SubmissionStep submissionStep);
+
+    public Object upDatePaper(PaperUpdateJson paperUpdateJson);
+
+    public Object getSubmissionInfoById(Integer submissionId);
 
 }

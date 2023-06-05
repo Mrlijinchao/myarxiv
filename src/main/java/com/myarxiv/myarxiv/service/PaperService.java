@@ -12,4 +12,5 @@ import java.util.List;
 */
 public interface PaperService extends IService<Paper> {
     public List<Object> getPaperListByUserId(Integer userId);
+    public Object getPaperInfoById(Integer paperId);
 }

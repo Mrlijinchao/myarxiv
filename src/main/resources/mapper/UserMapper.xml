@@ -17,12 +17,14 @@
             <result property="subjectId" column="subject_id" jdbcType="INTEGER"/>
             <result property="defaultCategoryId" column="default_category_id" jdbcType="INTEGER"/>
             <result property="userHomePage" column="user_home_page" jdbcType="VARCHAR"/>
+            <result property="userStatus" column="user_status" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         user_id,user_name,user_email,
         user_account,user_password,user_country_id,
         user_organization,career_status_id,user_create_time,
-        subject_id,default_category_id,user_home_page
+        subject_id,default_category_id,user_home_page,
+        user_status
     </sql>
 </mapper>

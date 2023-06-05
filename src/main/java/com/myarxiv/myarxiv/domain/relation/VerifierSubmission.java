@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
  *
  * @TableName verifier_submission
  */
+@Component
 @TableName(value ="verifier_submission")
 @Data
-@Component
 public class VerifierSubmission implements Serializable {
     /**
      *
@@ -43,6 +43,11 @@ public class VerifierSubmission implements Serializable {
      */
     private Date verifierSubmissionDate;
 
+    /**
+     *
+     */
+    private String verifierReason;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -62,7 +67,8 @@ public class VerifierSubmission implements Serializable {
             && (this.getVerifierId() == null ? other.getVerifierId() == null : this.getVerifierId().equals(other.getVerifierId()))
             && (this.getSubmissionId() == null ? other.getSubmissionId() == null : this.getSubmissionId().equals(other.getSubmissionId()))
             && (this.getVerifierSubmissionStatus() == null ? other.getVerifierSubmissionStatus() == null : this.getVerifierSubmissionStatus().equals(other.getVerifierSubmissionStatus()))
-            && (this.getVerifierSubmissionDate() == null ? other.getVerifierSubmissionDate() == null : this.getVerifierSubmissionDate().equals(other.getVerifierSubmissionDate()));
+            && (this.getVerifierSubmissionDate() == null ? other.getVerifierSubmissionDate() == null : this.getVerifierSubmissionDate().equals(other.getVerifierSubmissionDate()))
+            && (this.getVerifierReason() == null ? other.getVerifierReason() == null : this.getVerifierReason().equals(other.getVerifierReason()));
     }
 
     @Override
@@ -74,6 +80,7 @@ public class VerifierSubmission implements Serializable {
         result = prime * result + ((getSubmissionId() == null) ? 0 : getSubmissionId().hashCode());
         result = prime * result + ((getVerifierSubmissionStatus() == null) ? 0 : getVerifierSubmissionStatus().hashCode());
         result = prime * result + ((getVerifierSubmissionDate() == null) ? 0 : getVerifierSubmissionDate().hashCode());
+        result = prime * result + ((getVerifierReason() == null) ? 0 : getVerifierReason().hashCode());
         return result;
     }
 
@@ -88,6 +95,7 @@ public class VerifierSubmission implements Serializable {
         sb.append(", submissionId=").append(submissionId);
         sb.append(", verifierSubmissionStatus=").append(verifierSubmissionStatus);
         sb.append(", verifierSubmissionDate=").append(verifierSubmissionDate);
+        sb.append(", verifierReason=").append(verifierReason);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
